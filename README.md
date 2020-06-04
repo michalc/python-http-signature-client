@@ -10,5 +10,5 @@ HTTP client agnostic Python implementation of the client side of the [IETF draft
 ```python
 from http_signature_client import sign_ed25519
 
-headers = sign_ed25519(method, url, headers, private_key)
+signed_headers = sign_ed25519(method, url, headers_to_sign, private_key)
 ```
