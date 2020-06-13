@@ -11,7 +11,7 @@ HTTP client agnostic Python implementation of the client side of the [IETF draft
 from http_signature_client import sign_ed25519_sha512
 
 # Sign using an ED25519 private key, including a base64 encoded SHA-512 digest of the request body
-signed_headers = sign_ed25519_sha512(method, url, headers_to_sign, body_sha512, private_key)
+signed_headers = sign_ed25519_sha512(private_key, method, url, headers_to_sign, body_sha512)
 ```
 
 
@@ -29,7 +29,7 @@ class HttpSignature(AuthBase):
 
     def __call__(self, r):
         body_sha512 = b64encode(hashlib.sha512(r.body).digest()).decode('ascii')
-        r.headers = dict(sign_ed25519_sha512(r.method, r.path_url, headers_to_sign, body_sha512, self.private_key))
+        r.headers = dict(sign_ed25519_sha512(self.private_key, r.method, r.path_url, headers_to_sign, body_sha512))
         return r
 
 response = requests.post('http://mydomain.test/path', data=b'The bytes',
