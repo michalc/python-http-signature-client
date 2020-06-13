@@ -34,7 +34,7 @@ class HttpSignature(AuthBase):
         r.headers = dict(sign_ed25519(r.method, r.path_url, headers_to_sign, self.private_key))
         return r
 
-response = requests.post('http://mydomain.test/path', body=b'The bytes',
+response = requests.post('http://mydomain.test/path', data=b'The bytes',
                          auth=HttpSignature(private_key))
 ```
 
@@ -53,6 +53,6 @@ class HttpSignatureWithoutBodyDigest(AuthBase):
         r.headers = dict(sign_ed25519(r.method, r.path_url, r.headers.items() , self.private_key))
         return r
 
-response = requests.post('http://mydomain.test/path', body=b'The bytes',
+response = requests.post('http://mydomain.test/path', data=b'The bytes',
                          auth=HttpSignatureWithoutBodyDigest(private_key))
 ```
