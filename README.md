@@ -30,7 +30,7 @@ from requests.auth import AuthBase
 class HttpSignatureWithBodyDigest(AuthBase):
     def __init__(self, key_id, pem_private_key):
         self.key_id = key_id
-        self.private_key = private_key = load_pem_private_key(pem_private_key, password=None, backend=default_backend())
+        self.private_key = load_pem_private_key(pem_private_key, password=None, backend=default_backend())
 
     def __call__(self, r):
         body_sha512 = b64encode(hashlib.sha512(r.body).digest()).decode('ascii')
