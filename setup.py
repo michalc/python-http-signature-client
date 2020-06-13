@@ -19,9 +19,6 @@ setuptools.setup(
         'http_signature_client',
     ],
     python_requires='>=3.5.0',
-    install_requires=[
-        'cryptography>=2.9.2,<3',
-    ],
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
@@ -32,5 +29,6 @@ setuptools.setup(
     test_suite='tests',
     tests_require=[
         'freezegun==0.3.15',
+        'cryptography>=2.9.2',
     ]
 )

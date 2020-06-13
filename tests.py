@@ -2,23 +2,26 @@ from base64 import b64encode
 import hashlib
 import unittest
 
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from freezegun import freeze_time
-from http_signature_client import sign_ed25519_sha512
+
+from http_signature_client import sign
 
 
 class TestIntegration(unittest.TestCase):
 
     def test_no_headers(self):
         key_id = 'my-key'
-        private_key = TEST_PRIVATE_KEY
+        private_key = load_pem_private_key(
+            TEST_PRIVATE_KEY, password=None, backend=default_backend())
         method = 'POST'
         url = '/some-path?a=b&a=c&d=e'
-        headers = ()
         body_sha512 = b64encode(hashlib.sha512(b'some-data').digest()).decode('ascii')
+        headers = (('digest', f'SHA512={body_sha512}'),)
 
         with freeze_time('2012-01-14 03:21:34'):
-            signed_headers = sign_ed25519_sha512(
-                key_id, private_key, method, url, headers, body_sha512)
+            signed_headers = sign(key_id, private_key, method, url, headers)
 
         self.assertEqual(signed_headers, (
             (
