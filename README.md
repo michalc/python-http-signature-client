@@ -17,7 +17,7 @@ A deliberate subset of the signature algorithm is implemented:
 ```python
 from http_signature_client import sign_ed25519_sha512
 
-signed_headers = sign_ed25519_sha512(key_id, private_key, method, url, headers_to_sign, body_sha512)
+signed_headers = sign_ed25519_sha512(key_id, pem_private_key, method, path, headers_to_sign, body_sha512)
 ```
 
 
@@ -37,7 +37,7 @@ class HttpSignature(AuthBase):
     def __call__(self, r):
         body_sha512 = b64encode(hashlib.sha512(r.body).digest()).decode('ascii')
         r.headers = dict(sign_ed25519_sha512(self.key_id, self.private_key,
-                                             r.method, r.path_url, r.headers.items(), body_sha512))
+                                             r.method, r.path, r.headers.items(), body_sha512))
         return r
 
 response = requests.post('http://mydomain.test/path', data=b'The bytes',
