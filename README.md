@@ -8,20 +8,19 @@ HTTP client agnostic Python implementation of the client side of the [IETF draft
 ## Usage
 
 ```python
-from http_signature_client import sign_ed25519
+from http_signature_client import sign_ed25519_sha512
 
-signed_headers = sign_ed25519(method, url, headers_to_sign, private_key)
+# Sign using an ED25519 private key, including a base64 encoded SHA-512 digest of the request body
+signed_headers = sign_ed25519_sha512(method, url, headers_to_sign, body_sha512, private_key)
 ```
 
-If the server required a digest of the HTTP body, you must calculate `digest` header and pass it in `headers_to_sign`.
 
-
-## Recipe: Python Requests with SHA-256 digest of body
+## Recipe: Python Requests with SHA-512 digest of body
 
 ```python
 from base64 import b64encode
 import hashlib
-from http_signature_client import sign_ed25519
+from http_signature_client import sign_ed25519_sha512
 from requests.auth import AuthBase
 
 class HttpSignature(AuthBase):
@@ -29,30 +28,10 @@ class HttpSignature(AuthBase):
         self.private_key = private_key
 
     def __call__(self, r):
-        digest = b64encode(hashlib.sha256(r.body).digest()).decode('ascii')
-        headers_to_sign = r.headers.items() + (('digest', f'SHA-256={digest}'))
-        r.headers = dict(sign_ed25519(r.method, r.path_url, headers_to_sign, self.private_key))
+        body_sha512 = b64encode(hashlib.sha512(r.body).digest()).decode('ascii')
+        r.headers = dict(sign_ed25519_sha512(r.method, r.path_url, headers_to_sign, body_sha512, self.private_key))
         return r
 
 response = requests.post('http://mydomain.test/path', data=b'The bytes',
                          auth=HttpSignature(private_key))
-```
-
-
-## Recipe: Python Requests without digest of body
-
-```python
-from http_signature_client import sign_ed25519
-from requests.auth import AuthBase
-
-class HttpSignatureWithoutBodyDigest(AuthBase):
-    def __init__(self, private_key):
-        self.private_key = private_key
-
-    def __call__(self, r):
-        r.headers = dict(sign_ed25519(r.method, r.path_url, r.headers.items() , self.private_key))
-        return r
-
-response = requests.post('http://mydomain.test/path', data=b'The bytes',
-                         auth=HttpSignatureWithoutBodyDigest(private_key))
 ```
