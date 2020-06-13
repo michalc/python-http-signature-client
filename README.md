@@ -6,6 +6,7 @@ A deliberate subset of the signature algorithm is implemented:
 
 - requests are signed using an Ed25519 private key [currently seen as a good algorithm];
 - a SHA-512 digest of the body is required [for the server to authenticate more of the request];
+- the expires parameter is not sent [the server can decide this];
 - the algorithm parameter is not sent [it should not be used by the server to choose the algorithm].
 
 > This is a work in progress. This README serves as a rough design spec.
