@@ -13,7 +13,7 @@ from http_signature_client import sign_ed25519
 signed_headers = sign_ed25519(method, url, headers_to_sign, private_key)
 ```
 
-If the server required a digest of the HTTP body, you must include 
+If the server required a digest of the HTTP body, you must calculate `digest` header and pass it in `headers_to_sign`.
 
 
 ## Recipe: Python Requests with SHA-256 digest of body
