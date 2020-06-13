@@ -6,7 +6,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from freezegun import freeze_time
 
-from http_signature_client import sign
+from http_signature_client import sign_headers
 
 
 class TestIntegration(unittest.TestCase):
@@ -21,7 +21,7 @@ class TestIntegration(unittest.TestCase):
         headers = (('digest', f'SHA512={body_sha512}'),)
 
         with freeze_time('2012-01-14 03:21:34'):
-            signed_headers = sign(key_id, private_key.sign, method, url, headers)
+            signed_headers = sign_headers(key_id, private_key.sign, method, url, headers)
 
         self.assertEqual(signed_headers, (
             (

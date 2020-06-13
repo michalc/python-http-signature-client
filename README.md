@@ -24,7 +24,7 @@ from base64 import b64encode
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 import hashlib
-from http_signature_client import sign
+from http_signature_client import sign_headers
 from requests.auth import AuthBase
 
 class HttpSignatureWithBodyDigest(AuthBase):
@@ -35,7 +35,7 @@ class HttpSignatureWithBodyDigest(AuthBase):
     def __call__(self, r):
         body_sha512 = b64encode(hashlib.sha512(r.body).digest()).decode('ascii')
         headers_to_sign = r.headers.items() + (('digest', f'SHA512={body_sha512}'))
-        r.headers = dict(sign_ed25519_sha512(
+        r.headers = dict(sign_headers(
             self.key_id, self.private_key.sign,
             r.method, r.path, r.headers.items(), body_sha512))
         return r
