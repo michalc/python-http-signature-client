@@ -21,7 +21,7 @@ class TestIntegration(unittest.TestCase):
         headers = (('digest', f'SHA512={body_sha512}'),)
 
         with freeze_time('2012-01-14 03:21:34'):
-            signed_headers = sign(key_id, private_key, method, url, headers)
+            signed_headers = sign(key_id, private_key.sign, method, url, headers)
 
         self.assertEqual(signed_headers, (
             (

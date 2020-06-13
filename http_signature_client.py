@@ -3,7 +3,7 @@ from collections import defaultdict
 from datetime import datetime
 
 
-def sign(key_id, private_key, method, path, headers_to_sign):
+def sign(key_id, signer, method, path, headers_to_sign):
     created = str(int(datetime.now().timestamp()))
 
     def canonical_headers():
@@ -17,7 +17,7 @@ def sign(key_id, private_key, method, path, headers_to_sign):
         ('(created)', created),
     ) + canonical_headers()
 
-    signature = b64encode(private_key.sign('\n'.join(
+    signature = b64encode(signer('\n'.join(
         f'{key}: {value}' for key, value in signature_input
     ).encode('ascii'))).decode('ascii')
 

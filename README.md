@@ -36,7 +36,7 @@ class HttpSignatureWithBodyDigest(AuthBase):
         body_sha512 = b64encode(hashlib.sha512(r.body).digest()).decode('ascii')
         headers_to_sign = r.headers.items() + (('digest', f'SHA512={body_sha512}'))
         r.headers = dict(sign_ed25519_sha512(
-            self.key_id, self.private_key,
+            self.key_id, self.private_key.sign,
             r.method, r.path, r.headers.items(), body_sha512))
         return r
 
