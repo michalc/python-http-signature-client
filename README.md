@@ -25,20 +25,20 @@ import urllib3
 
 from http_signature_client import sign_headers
 
-class HttpSignatureWithBodyDigest(request.auth.AuthBase):
-    def __init__(self, key_id, pem_private_key):
-        self.key_id = key_id
-        self.private_key = load_pem_private_key(
+def HttpSignature(key_id, pem_private_key):
+    private_key = load_pem_private_key(
             pem_private_key, password=None, backend=default_backend())
 
-    def __call__(self, r):
+    def sign(r):
         body_sha512 = b64encode(hashlib.sha512(r.body).digest()).decode('ascii')
         headers_to_sign = tuple(r.headers.items()) + (('digest', f'SHA512={body_sha512}'),)
         parsed_url = urllib3.util.url.parse_url(r.path_url)
         path = parsed_url.path + (f'?{parsed_url.query}' if parsed_url.query else '')
         r.headers = dict(sign_headers(
-            self.key_id, self.private_key.sign, r.method, path, headers_to_sign))
+            key_id, private_key.sign, r.method, path, headers_to_sign))
         return r
+
+    return sign
 
 # In real cases, take credentials from environment variables/secret store
 response = requests.post('http://mydomain.test/path', data=b'The bytes', auth=HttpSignature(

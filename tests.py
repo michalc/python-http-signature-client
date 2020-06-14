@@ -120,20 +120,20 @@ class TestIntegration(unittest.TestCase):
             thread.join()
         self.addCleanup(cleanup)
 
-        class HttpSignatureWithBodyDigest(requests.auth.AuthBase):
-            def __init__(self, key_id, pem_private_key):
-                self.key_id = key_id
-                self.private_key = load_pem_private_key(
-                    pem_private_key, password=None, backend=default_backend())
+        def HttpSignatureWithBodyDigest(key_id, pem_private_key):
+            private_key = load_pem_private_key(
+                pem_private_key, password=None, backend=default_backend())
 
-            def __call__(self, r):
+            def sign(r):
                 body_sha512 = b64encode(hashlib.sha512(r.body).digest()).decode('ascii')
                 headers_to_sign = tuple(r.headers.items()) + (('digest', f'SHA512={body_sha512}'),)
                 parsed_url = urllib3.util.url.parse_url(r.path_url)
                 path = parsed_url.path + (f'?{parsed_url.query}' if parsed_url.query else '')
                 r.headers = dict(sign_headers(
-                    self.key_id, self.private_key.sign, r.method, path, headers_to_sign))
+                    key_id, private_key.sign, r.method, path, headers_to_sign))
                 return r
+
+            return sign
 
         def make_request():
             key_id = 'my-key'
