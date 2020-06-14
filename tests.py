@@ -39,13 +39,15 @@ class TestIntegration(unittest.TestCase):
         with freeze_time('2012-01-14 03:21:34'):
             signed_headers = sign_headers(key_id, private_key.sign, method, url, headers)
 
+        correct_authorization = \
+            'Signature: keyId="my-key", created=1326511294, headers="(request-target) (created) ' \
+            'digest x-custom", signature="rRcnh3PzKV8isZ+4fW7T4aTswbbDT+JGyQ4HtFn8GlxkbHxkRmN5W3' \
+            'HPRlRMSF/NrawTZ+kXjkFKaUrar0syAw=="'
+
         self.assertEqual(signed_headers, (
             (
                 'authorization',
-                'Signature: keyId="my-key", created=1326511294, headers="(request-target) '
-                '(created) digest x-custom", '
-                'signature="rRcnh3PzKV8isZ+4fW7T4aTswbbDT+JGyQ4HtFn8GlxkbHxkRmN5W3HPRlRMSF/NrawTZ+'
-                'kXjkFKaUrar0syAw=="',
+                correct_authorization,
             ),
             (
                 'digest',
