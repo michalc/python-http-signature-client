@@ -29,6 +29,6 @@ setuptools.setup(
     test_suite='tests',
     tests_require=[
         'freezegun==0.3.15',
-        'cryptography>=2.9.2',
+        'cryptography==2.9.2',
     ]
 )
