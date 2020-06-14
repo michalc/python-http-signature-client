@@ -3,6 +3,12 @@
 Utility function with an HTTP client agnostic Python implementation of the client side of the [IETF draft "Signing HTTP Messages"](https://tools.ietf.org/html/draft-ietf-httpbis-message-signatures-00). No dependencies other than the standard library, but [cryptography](https://github.com/pyca/cryptography) would typically be required in client code to load a private key.
 
 
+## Installation
+
+```python
+pip install http-signature-client
+```
+
 ## Usage
 
 ```python
