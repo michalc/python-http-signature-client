@@ -52,6 +52,19 @@ response = requests.post('http://mydomain.test/path', data=b'The bytes', auth=Ht
 ```
 
 
+## Recipe: Create a Ed25519 public/private key pair
+
+```python
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat, NoEncryption
+from cryptography.hazmat.primitives.serialization import PublicFormat
+
+private_key = Ed25519PrivateKey.generate()
+print(private_key.private_bytes(encoding=Encoding.PEM, format=PrivateFormat.PKCS8, encryption_algorithm=NoEncryption()))
+print(private_key.public_key().public_bytes(encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo))
+```
+
+
 ## What's implemented
 
 A deliberate subset of the signature algorithm is implemented:
