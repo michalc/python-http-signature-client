@@ -34,7 +34,7 @@ class TestIntegration(unittest.TestCase):
             (
                 'authorization',
                 'Signature: keyId="my-key", created=1326511294, headers="(request-target) '
-                '(created) digest, '
+                '(created) digest", '
                 'signature="hVRwKrNAhELt7cMBx+AKDRLlzKgJp1yKkJHh1HRM/JLlTpJOIWw56Hljpeq9tqXf1zqYWy'
                 '25bQ6vYlJeHivTCg=="',
             ),
@@ -94,7 +94,7 @@ class TestIntegration(unittest.TestCase):
             (
                 'authorization',
                 'Signature: keyId="my-key", created=1326511294, headers="(request-target) '
-                '(created) user-agent accept-encoding accept connection content-length digest, '
+                '(created) user-agent accept-encoding accept connection content-length digest", '
                 'signature="IngdVNAhHx5E98AdkeOrkUC0Zy8v1ix2E4rbG0c3i9X3yicHKNKt+uACYntKvNFA5q1q9C'
                 'GoG45W63u3JshCDg=="',
             ),

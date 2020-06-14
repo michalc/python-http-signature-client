@@ -23,7 +23,7 @@ def sign_headers(key_id, sign, method, path, headers_to_sign):
 
     headers = ' '.join(key for key, _ in signature_input)
     authorization = \
-        f'Signature: keyId="{key_id}", created={created}, headers="{headers}, ' \
+        f'Signature: keyId="{key_id}", created={created}, headers="{headers}", ' \
         f'signature="{signature}"'
 
     return (('authorization', authorization),) + headers_to_sign
