@@ -40,7 +40,7 @@ class HttpSignature(httpx.Auth):
     def auth_flow(self, request):
         body_sha512 = b64encode(hashlib.sha512(r.content).digest()).decode('ascii')
         headers_to_sign = tuple(request.headers.items()) + (('digest', f'SHA512={body_sha512}'),)
-        request.headers = dict(sign_headers(
+        request.headers = httpx.Headers(sign_headers(
             self.key_id, self.private_key.sign, request.method,
             request.url.full_path, headers_to_sign))
         yield r

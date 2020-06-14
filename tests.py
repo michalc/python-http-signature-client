@@ -174,6 +174,7 @@ class TestIntegration(unittest.TestCase):
                 nonlocal received_headers
                 received_headers = tuple(self.headers.items())
                 self.send_response(200)
+                self.send_header('content-length', '0')
                 self.end_headers()
 
         class ThreadingHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
@@ -201,7 +202,7 @@ class TestIntegration(unittest.TestCase):
                 body_sha512 = b64encode(hashlib.sha512(request.content).digest()).decode('ascii')
                 headers_to_sign = tuple(
                     request.headers.items()) + (('digest', f'SHA512={body_sha512}'),)
-                request.headers = dict(sign_headers(
+                request.headers = httpx.Headers(sign_headers(
                     self.key_id, self.private_key.sign, request.method,
                     request.url.full_path, headers_to_sign))
                 yield request
@@ -223,10 +224,10 @@ class TestIntegration(unittest.TestCase):
             'host': 'localhost:8080',
             'authorization': 'Signature: keyId="my-key", created=1326511294, '
                              'headers="(request-target) (created) host user-agent accept '
-                             'accept-encoding content-length digest", signature="Knvr+lliv0/L4DIKn'
-                             'yDogOftCJ+ASvSbhAHZBrGa0MYr1Lwqf8QiwSPWmmpFLfM86CcBYkYt06xDdVsS1bPPD'
-                             'A=="',
-            'user-agent': 'python-httpx/0.11.1',
+                             'accept-encoding content-length digest", signature="KfvrEdkreYuFQNpCz'
+                             'CK2oZJZg3lFM1UZPOjOH8aixLTO0ilBDvcvDk0PMXLd0kj0LpbR2Qy2w/VgOhwqbiqbD'
+                             'w=="',
+            'user-agent': 'python-httpx/0.13.3',
             'accept-encoding': 'gzip, deflate',
             'accept': '*/*',
             'connection': 'keep-alive',
