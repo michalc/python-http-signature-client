@@ -1,6 +1,6 @@
 # http-signature-client
 
-HTTP client agnostic Python implementation of the client side of the [IETF draft "Signing HTTP Messages"](https://tools.ietf.org/html/draft-ietf-httpbis-message-signatures-00). No dependencies other than the standard library, but [cryptography](https://github.com/pyca/cryptography) would typically be required in client code to load a private key.
+Utility function with an HTTP client agnostic Python implementation of the client side of the [IETF draft "Signing HTTP Messages"](https://tools.ietf.org/html/draft-ietf-httpbis-message-signatures-00). No dependencies other than the standard library, but [cryptography](https://github.com/pyca/cryptography) would typically be required in client code to load a private key.
 
 A deliberate subset of the signature algorithm is implemented:
 
@@ -11,9 +11,9 @@ A deliberate subset of the signature algorithm is implemented:
 ## Usage
 
 ```python
-from http_signature_client import sign_ed25519_sha512
+from http_signature_client import sign_headers
 
-signed_headers = sign_headers(key_id, private_key, method, path, headers_to_sign)
+signed_headers = sign_headers(key_id, sign, method, path, headers_to_sign)
 ```
 
 
