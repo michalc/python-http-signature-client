@@ -8,7 +8,7 @@ def long_description():
 
 setuptools.setup(
     name='http-signature-client',
-    version='0.0.0',
+    version='0.0.1',
     author='Michal Charemza',
     author_email='michal@charemza.name',
     description='Implementation of the client side of the IETF draft "Signing HTTP Messages"',
