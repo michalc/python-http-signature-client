@@ -20,13 +20,13 @@ class TestIntegration(unittest.TestCase):
 
     def test_with_digest(self):
         key_id = 'my-key'
-        pem_prviate_key = \
+        pem_private_key = \
             b'-----BEGIN PRIVATE KEY-----\n' \
             b'MC4CAQAwBQYDK2VwBCIEINQG5lNt1bE8TZa68mV/WZdpqsXaOXBHvgPQGm5CcjHp\n' \
             b'-----END PRIVATE KEY-----\n'
 
         private_key = load_pem_private_key(
-            pem_prviate_key, password=None, backend=default_backend())
+            pem_private_key, password=None, backend=default_backend())
         method = 'post'
         url = '/some-path?a=b&a=c&d=e'
         body_sha512 = b64encode(hashlib.sha512(b'some-data').digest()).decode('ascii')
