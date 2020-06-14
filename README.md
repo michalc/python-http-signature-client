@@ -13,7 +13,7 @@ A deliberate subset of the signature algorithm is implemented:
 ```python
 from http_signature_client import sign_ed25519_sha512
 
-signed_headers = sign(key_id, private_key, method, path, headers_to_sign)
+signed_headers = sign_headers(key_id, private_key, method, path, headers_to_sign)
 ```
 
 
