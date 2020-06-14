@@ -12,7 +12,7 @@ signed_headers = sign_headers(key_id, sign, method, path, headers_to_sign)
 ```
 
 
-## Recipe: Python requests
+## Recipe: Python requests with PEM-encoded private key and SHA-512 body digest
 
 ```python
 from base64 import b64encode
