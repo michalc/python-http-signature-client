@@ -30,5 +30,7 @@ setuptools.setup(
     tests_require=[
         'freezegun==0.3.15',
         'cryptography==2.9.2',
+        'requests==2.23.0',
+        'urllib3==1.25.9',
     ]
 )
