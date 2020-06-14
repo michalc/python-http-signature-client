@@ -41,7 +41,7 @@ def HttpSignature(key_id, pem_private_key):
     return sign
 
 # In real cases, take credentials from environment variables/secret store
-response = requests.post('http://mydomain.test/path', data=b'The bytes', auth=HttpSignature(
+response = requests.post('https://postman-echo.com/post', data=b'The bytes', auth=HttpSignature(
     key_id='my-key',
     pem_private_key= \
         b'-----BEGIN PRIVATE KEY-----\n' \
