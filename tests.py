@@ -62,6 +62,34 @@ class TestIntegration(unittest.TestCase):
             )
         ))
 
+        headers_same_canonicalisation = (
+            ('Digest', f'SHA512={body_sha512}'),
+            ('X-Custom', 'first  '),
+            ('x-custom', '  second'),
+        )
+
+        with freeze_time('2012-01-14 03:21:34'):
+            signed_headers_mixed = sign_headers(key_id, private_key.sign, method, url,
+                                                headers_same_canonicalisation)
+
+        self.assertEqual(signed_headers_mixed, (
+            (
+                'authorization',
+                correct_authorization,
+            ),
+            (
+                'Digest',
+                'SHA512=4cT8Z/GQnjUIPMUwn8ujbSdDM6PEAJqUqXBSc+QfyIthia0VdVHj050dqkQSJk0TEgtnE8mdO+'
+                'TWTH306npMew==',
+            ),
+            (
+                'X-Custom', 'first  ',
+            ),
+            (
+                'x-custom', '  second',
+            )
+        ))
+
     def test_requests(self):
         received_headers = None
 
