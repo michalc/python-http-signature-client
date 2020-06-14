@@ -2,11 +2,6 @@
 
 Utility function with an HTTP client agnostic Python implementation of the client side of the [IETF draft "Signing HTTP Messages"](https://tools.ietf.org/html/draft-ietf-httpbis-message-signatures-00). No dependencies other than the standard library, but [cryptography](https://github.com/pyca/cryptography) would typically be required in client code to load a private key.
 
-A deliberate subset of the signature algorithm is implemented:
-
-- the expires parameter is not sent [the server can decide this];
-- the algorithm parameter is not sent [it should not be used by the server to choose the algorithm].
-
 
 ## Usage
 
@@ -43,3 +38,14 @@ class HttpSignatureWithBodyDigest(AuthBase):
 response = requests.post('http://mydomain.test/path', data=b'The bytes',
                          auth=HttpSignature(key_id, pem_private_key))
 ```
+
+
+## What's implemented
+
+A deliberate subset of the signature algorithm is implemented:
+
+- the `request-target` pseudo-header is signed [to allow the server to verify the method and path]
+- the `created` pseudo-header is signed [to allow the server to decide to reject if the skew is too large]
+- the `headers` parameter is sent [to allow the server to verify headers and pseudo-headers]
+- the `expires` parameter is _not_ sent [the server can decide this using the created parameter];
+- the algorithm parameter is _not_ sent [it should not be used by the server to choose the algorithm].
