@@ -123,7 +123,7 @@ print(private_key.public_key().public_bytes(encoding=Encoding.PEM, format=Public
 
 - `headers_to_sign` - HTTP header names and values to sign.
 
-- `headers_to_ignore` - HTTP header names to _not_ be signed, even if passed in `headers_to_ignore`. These default to hop-by-hop-headers that are typically set by intermediaries.
+- `headers_to_ignore` - HTTP header names to _not_ be signed, even if passed in `headers_to_sign`. These default to hop-by-hop-headers that are typically set by intermediaries.
 
 ### Returns
 
