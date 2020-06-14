@@ -15,7 +15,7 @@ class TestIntegration(unittest.TestCase):
         key_id = 'my-key'
         private_key = load_pem_private_key(
             TEST_PRIVATE_KEY, password=None, backend=default_backend())
-        method = 'POST'
+        method = 'post'
         url = '/some-path?a=b&a=c&d=e'
         body_sha512 = b64encode(hashlib.sha512(b'some-data').digest()).decode('ascii')
         headers = (('digest', f'SHA512={body_sha512}'),)
@@ -28,8 +28,8 @@ class TestIntegration(unittest.TestCase):
                 'authorization',
                 'Signature: keyId="my-key", created=1326511294, headers="(request-target) '
                 '(created) digest, '
-                'signature="f5rTFUPTfMub+B/F+3f7YoniDXDJRhhf8d7LMYfvUGEMNgIhGYBTj2FezkLY/Sv94c9CNq'
-                'cRGhCYifJ106B5Ag=="',
+                'signature="hVRwKrNAhELt7cMBx+AKDRLlzKgJp1yKkJHh1HRM/JLlTpJOIWw56Hljpeq9tqXf1zqYWy'
+                '25bQ6vYlJeHivTCg=="',
             ),
             (
                 'digest',
