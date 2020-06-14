@@ -68,8 +68,8 @@ print(private_key.public_key().public_bytes(encoding=Encoding.PEM, format=Public
 
 A deliberate subset of the signature algorithm is implemented:
 
-- the `request-target` pseudo-header is signed [to allow the server to verify the method and path]
-- the `created` pseudo-header is signed [to allow the server to decide to reject if the skew is too large]
+- the `(request-target)` pseudo-header is signed [to allow the server to verify the method and path]
+- the `(created)` pseudo-header is signed [to allow the server to decide to reject if the skew is too large]
 - the `headers` parameter is sent [to allow the server to verify headers and pseudo-headers]
 - the `expires` parameter is _not_ sent [the server can decide this using the created parameter];
 - the `algorithm` parameter is _not_ sent [it should not be used by the server to choose the algorithm].
