@@ -1,4 +1,4 @@
-# http-signature-client
+# http-signature-client  [![CircleCI](https://circleci.com/gh/michalc/python-http-signature-client.svg?style=shield)](https://circleci.com/gh/michalc/python-http-signature-client) [![Test Coverage](https://api.codeclimate.com/v1/badges/fcf6ed3ac0c04d3878a8/test_coverage)](https://codeclimate.com/github/michalc/python-http-signature-client/test_coverage)
 
 Utility function with an HTTP client agnostic Python implementation of the client side of the [IETF draft "Signing HTTP Messages"](https://tools.ietf.org/html/draft-ietf-httpbis-message-signatures-00). No dependencies other than the standard library, but [cryptography](https://github.com/pyca/cryptography) would typically be required in client code to load a private key.
 
