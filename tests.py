@@ -20,8 +20,13 @@ class TestIntegration(unittest.TestCase):
 
     def test_with_digest(self):
         key_id = 'my-key'
+        pem_prviate_key = \
+            b'-----BEGIN PRIVATE KEY-----\n' \
+            b'MC4CAQAwBQYDK2VwBCIEINQG5lNt1bE8TZa68mV/WZdpqsXaOXBHvgPQGm5CcjHp\n' \
+            b'-----END PRIVATE KEY-----\n'
+
         private_key = load_pem_private_key(
-            TEST_PRIVATE_KEY, password=None, backend=default_backend())
+            pem_prviate_key, password=None, backend=default_backend())
         method = 'post'
         url = '/some-path?a=b&a=c&d=e'
         body_sha512 = b64encode(hashlib.sha512(b'some-data').digest()).decode('ascii')
@@ -93,9 +98,17 @@ class TestIntegration(unittest.TestCase):
                     self.key_id, self.private_key.sign, r.method.lower(), path, headers_to_sign))
                 return r
 
-        with freeze_time('2012-01-14 03:21:34'):
+        def make_request():
+            key_id = 'my-key'
+            pem_private_key = \
+                b'-----BEGIN PRIVATE KEY-----\n' \
+                b'MC4CAQAwBQYDK2VwBCIEINQG5lNt1bE8TZa68mV/WZdpqsXaOXBHvgPQGm5CcjHp\n' \
+                b'-----END PRIVATE KEY-----\n'
             requests.post('http://localhost:8080/path?a=b', data=b'The bytes',
-                          auth=HttpSignatureWithBodyDigest('my-key', TEST_PRIVATE_KEY))
+                          auth=HttpSignatureWithBodyDigest(key_id, pem_private_key))
+
+        with freeze_time('2012-01-14 03:21:34'):
+            make_request()
 
         self.assertEqual(received_headers, (
             (
@@ -130,9 +143,3 @@ class TestIntegration(unittest.TestCase):
                 'XKpCQmDaQxCg==',
             )
         ))
-
-
-TEST_PRIVATE_KEY = \
-    b'-----BEGIN PRIVATE KEY-----\n' \
-    b'MC4CAQAwBQYDK2VwBCIEINQG5lNt1bE8TZa68mV/WZdpqsXaOXBHvgPQGm5CcjHp\n' \
-    b'-----END PRIVATE KEY-----\n'
