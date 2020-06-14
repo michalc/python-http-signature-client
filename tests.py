@@ -144,9 +144,8 @@ class TestIntegration(unittest.TestCase):
             'host': 'localhost:8080',
             'authorization': 'Signature: keyId="my-key", created=1326511294, '
                              'headers="(request-target) (created) user-agent accept-encoding '
-                             'accept connection content-length digest", signature="IngdVNAhHx5E98A'
-                             'dkeOrkUC0Zy8v1ix2E4rbG0c3i9X3yicHKNKt+uACYntKvNFA5q1q9CGoG45W63u3Jsh'
-                             'CDg=="',
+                             'accept content-length digest", signature="3xG3OmL3Edy62McmHf6aXhvrcC'
+                             'P3J9isR8yMA6tIjdyoe8vQz9PJP8AF8oLUzmcVO/dvG/F0zCCAoAah1FTkDg=="',
             'user-agent': 'python-requests/2.23.0',
             'accept-encoding': 'gzip, deflate',
             'accept': '*/*',

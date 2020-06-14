@@ -3,14 +3,17 @@ from collections import defaultdict
 from datetime import datetime
 
 
-def sign_headers(key_id, sign, method, path, headers_to_sign):
+def sign_headers(key_id, sign, method, path, headers_to_sign,
+                 hop_by_hop_headers=('keep-alive', 'transfer-encoding', 'connection')):
     method_lower = method.lower()
     created = str(int(datetime.now().timestamp()))
 
     def canonical_headers():
         headers_lists = defaultdict(list)
         for key, value in headers_to_sign:
-            headers_lists[key.lower()].append(value.strip())
+            key_lower = key.lower()
+            if key_lower not in hop_by_hop_headers:
+                headers_lists[key_lower].append(value.strip())
         return tuple((key, ', '.join(values)) for key, values in headers_lists.items())
 
     signature_input = (
