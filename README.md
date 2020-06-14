@@ -56,8 +56,7 @@ response = requests.post('http://mydomain.test/path', data=b'The bytes', auth=Ht
 
 ```python
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
-from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat, NoEncryption
-from cryptography.hazmat.primitives.serialization import PublicFormat
+from cryptography.hazmat.primitives.serialization import Encoding, NoEncryption, PrivateFormat, PublicFormat
 
 private_key = Ed25519PrivateKey.generate()
 print(private_key.private_bytes(encoding=Encoding.PEM, format=PrivateFormat.PKCS8, encryption_algorithm=NoEncryption()))
