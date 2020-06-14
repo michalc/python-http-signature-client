@@ -7,8 +7,8 @@ from typing import Callable, DefaultDict, FrozenSet, List, Tuple
 def sign_headers(
         key_id: str, sign: Callable[[bytes], bytes], method: str, path: str,
         headers_to_sign: Tuple[Tuple[str, str], ...],
-        hop_by_hop_headers: FrozenSet[str] = frozenset(('keep-alive',
-                                                        'transfer-encoding', 'connection'))):
+        headers_to_ignore: FrozenSet[str] = frozenset(('keep-alive',
+                                                       'transfer-encoding', 'connection'))):
     method_lower = method.lower()
     created = str(int(datetime.now().timestamp()))
 
@@ -16,7 +16,7 @@ def sign_headers(
         headers_lists: DefaultDict[str, List[str]] = defaultdict(list)
         for key, value in headers_to_sign:
             key_lower = key.lower()
-            if key_lower not in hop_by_hop_headers:
+            if key_lower not in headers_to_ignore:
                 headers_lists[key_lower].append(value.strip())
         return tuple((key, ', '.join(values)) for key, values in headers_lists.items())
 
