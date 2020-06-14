@@ -25,23 +25,34 @@ class TestIntegration(unittest.TestCase):
         method = 'post'
         url = '/some-path?a=b&a=c&d=e'
         body_sha512 = b64encode(hashlib.sha512(b'some-data').digest()).decode('ascii')
-        headers = (('digest', f'SHA512={body_sha512}'),)
+        headers = (
+            ('digest', f'SHA512={body_sha512}'),
+            ('x-custom', 'first  '),
+            ('x-custom', '  second'),
+        )
 
         with freeze_time('2012-01-14 03:21:34'):
             signed_headers = sign_headers(key_id, private_key.sign, method, url, headers)
 
+        print(signed_headers)
         self.assertEqual(signed_headers, (
             (
                 'authorization',
                 'Signature: keyId="my-key", created=1326511294, headers="(request-target) '
-                '(created) digest", '
-                'signature="hVRwKrNAhELt7cMBx+AKDRLlzKgJp1yKkJHh1HRM/JLlTpJOIWw56Hljpeq9tqXf1zqYWy'
-                '25bQ6vYlJeHivTCg=="',
+                '(created) digest x-custom", '
+                'signature="rRcnh3PzKV8isZ+4fW7T4aTswbbDT+JGyQ4HtFn8GlxkbHxkRmN5W3HPRlRMSF/NrawTZ+'
+                'kXjkFKaUrar0syAw=="',
             ),
             (
                 'digest',
                 'SHA512=4cT8Z/GQnjUIPMUwn8ujbSdDM6PEAJqUqXBSc+QfyIthia0VdVHj050dqkQSJk0TEgtnE8mdO+'
                 'TWTH306npMew==',
+            ),
+            (
+                'x-custom', 'first  ',
+            ),
+            (
+                'x-custom', '  second',
             )
         ))
 

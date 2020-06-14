@@ -9,7 +9,7 @@ def sign_headers(key_id, sign, method, path, headers_to_sign):
     def canonical_headers():
         headers_lists = defaultdict(list)
         for key, value in headers_to_sign:
-            headers_lists[key.strip().lower()].append(value)
+            headers_lists[key.lower()].append(value.strip())
         return tuple((key, ', '.join(values)) for key, values in headers_lists.items())
 
     signature_input = (
