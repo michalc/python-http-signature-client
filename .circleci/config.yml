@@ -28,6 +28,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Check types
+          command: |
+            pip install mypy==0.780
+            mypy http_signature_client.py
+      - run:
           name: Install coverage and reporter
           command: |
             pip install coverage==4.5.2

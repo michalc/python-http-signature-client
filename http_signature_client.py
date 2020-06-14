@@ -1,10 +1,14 @@
 from base64 import b64encode
 from collections import defaultdict
 from datetime import datetime
+from typing import Callable, FrozenSet, Tuple
 
 
-def sign_headers(key_id, sign, method, path, headers_to_sign,
-                 hop_by_hop_headers=('keep-alive', 'transfer-encoding', 'connection')):
+def sign_headers(
+        key_id: str, sign: Callable[[bytes], bytes], method: str, path: str,
+        headers_to_sign: Tuple[Tuple[str, str]],
+        hop_by_hop_headers: FrozenSet = frozenset(('keep-alive',
+                                                   'transfer-encoding', 'connection'))):
     method_lower = method.lower()
     created = str(int(datetime.now().timestamp()))
 
