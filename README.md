@@ -17,6 +17,45 @@ from http_signature_client import sign_headers
 signed_headers = sign_headers(key_id, sign, method, path, headers_to_sign)
 ```
 
+## Recipe: HTTPX with PEM-encoded private key and SHA-512 body digest
+
+```python
+from base64 import b64encode
+import hashlib
+
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
+import httpx
+
+from http_signature_client import sign_headers
+
+class HttpSignature(httpx.Auth):
+    requires_request_body = True
+
+    def __init__(self, key_id, pem_private_key):
+        self.key_id = key_id
+        self.private_key = load_pem_private_key(
+            pem_private_key, password=None, backend=default_backend())
+
+    def auth_flow(self, request):
+        body_sha512 = b64encode(hashlib.sha512(r.content).digest()).decode('ascii')
+        headers_to_sign = tuple(request.headers.items()) + (('digest', f'SHA512={body_sha512}'),)
+        request.headers = dict(sign_headers(
+            self.key_id, self.private_key.sign, request.method,
+            request.url.full_path, headers_to_sign))
+        yield r
+
+# In real cases, take credentials from environment variables/secret store
+response = requests.post('https://postman-echo.com/post', data=b'The bytes', auth=HttpSignature(
+    key_id='my-key',
+    pem_private_key= \
+        b'-----BEGIN PRIVATE KEY-----\n' \
+        b'MC4CAQAwBQYDK2VwBCIEINQG5lNt1bE8TZa68mV/WZdpqsXaOXBHvgPQGm5CcjHp\n' \
+        b'-----END PRIVATE KEY-----\n',
+    )
+)
+```
+
 
 ## Recipe: Python requests with PEM-encoded private key and SHA-512 body digest
 

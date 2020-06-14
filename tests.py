@@ -10,6 +10,7 @@ import threading
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from freezegun import freeze_time
+import httpx
 import requests
 import urllib3
 
@@ -117,6 +118,7 @@ class TestIntegration(unittest.TestCase):
 
         def cleanup():
             server.shutdown()
+            server.server_close()
             thread.join()
         self.addCleanup(cleanup)
 
@@ -155,6 +157,76 @@ class TestIntegration(unittest.TestCase):
                              'accept content-length digest", signature="3xG3OmL3Edy62McmHf6aXhvrcC'
                              'P3J9isR8yMA6tIjdyoe8vQz9PJP8AF8oLUzmcVO/dvG/F0zCCAoAah1FTkDg=="',
             'user-agent': 'python-requests/2.23.0',
+            'accept-encoding': 'gzip, deflate',
+            'accept': '*/*',
+            'connection': 'keep-alive',
+            'content-length': '9',
+            'digest': 'SHA512=Jpu2uP4aOrJMRxr5j9NKiqwK0ksXiftpjdHOGJTU4v7BxYvf/nEYHxeWL7YCsFXE3XJ9'
+                      'q2luOWXKpCQmDaQxCg=='
+        })
+
+    def test_httpx(self):
+        self.maxDiff = 10000
+        received_headers = ()
+
+        class Handler(BaseHTTPRequestHandler):
+            def do_POST(self):
+                nonlocal received_headers
+                received_headers = tuple(self.headers.items())
+                self.send_response(200)
+                self.end_headers()
+
+        class ThreadingHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
+            daemon_threads = True
+
+        server = ThreadingHTTPServer(('0.0.0.0', 8080), Handler)
+        thread = threading.Thread(target=server.serve_forever)
+        thread.start()
+
+        def cleanup():
+            server.shutdown()
+            server.server_close()
+            thread.join()
+        self.addCleanup(cleanup)
+
+        class HttpSignatureWithBodyDigest(httpx.Auth):
+            requires_request_body = True
+
+            def __init__(self, key_id, pem_private_key):
+                self.key_id = key_id
+                self.private_key = load_pem_private_key(
+                    pem_private_key, password=None, backend=default_backend())
+
+            def auth_flow(self, request):
+                body_sha512 = b64encode(hashlib.sha512(request.content).digest()).decode('ascii')
+                headers_to_sign = tuple(
+                    request.headers.items()) + (('digest', f'SHA512={body_sha512}'),)
+                request.headers = dict(sign_headers(
+                    self.key_id, self.private_key.sign, request.method,
+                    request.url.full_path, headers_to_sign))
+                yield request
+
+        def make_request():
+            key_id = 'my-key'
+            pem_private_key = \
+                b'-----BEGIN PRIVATE KEY-----\n' \
+                b'MC4CAQAwBQYDK2VwBCIEINQG5lNt1bE8TZa68mV/WZdpqsXaOXBHvgPQGm5CcjHp\n' \
+                b'-----END PRIVATE KEY-----\n'
+            httpx.post('http://localhost:8080/path?a=b', data=b'The bytes',
+                       auth=HttpSignatureWithBodyDigest(key_id, pem_private_key))
+
+        with freeze_time('2012-01-14 03:21:34'):
+            make_request()
+
+        received_headers_dict = dict((key.lower(), value) for key, value in received_headers)
+        self.assertEqual(received_headers_dict, {
+            'host': 'localhost:8080',
+            'authorization': 'Signature: keyId="my-key", created=1326511294, '
+                             'headers="(request-target) (created) host user-agent accept '
+                             'accept-encoding content-length digest", signature="Knvr+lliv0/L4DIKn'
+                             'yDogOftCJ+ASvSbhAHZBrGa0MYr1Lwqf8QiwSPWmmpFLfM86CcBYkYt06xDdVsS1bPPD'
+                             'A=="',
+            'user-agent': 'python-httpx/0.11.1',
             'accept-encoding': 'gzip, deflate',
             'accept': '*/*',
             'connection': 'keep-alive',
