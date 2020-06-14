@@ -40,6 +40,11 @@ class HttpSignatureWithBodyDigest(request.auth.AuthBase):
             self.key_id, self.private_key.sign, r.method, path, headers_to_sign))
         return r
 
+key_id = 'my-key'
+pem_private_key =\
+    b'-----BEGIN PRIVATE KEY-----\n' \
+    b'MC4CAQAwBQYDK2VwBCIEINQG5lNt1bE8TZa68mV/WZdpqsXaOXBHvgPQGm5CcjHp\n' \
+    b'-----END PRIVATE KEY-----\n'
 response = requests.post('http://mydomain.test/path', data=b'The bytes',
                          auth=HttpSignature(key_id, pem_private_key))
 ```
