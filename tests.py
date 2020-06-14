@@ -91,7 +91,7 @@ class TestIntegration(unittest.TestCase):
         ))
 
     def test_requests(self):
-        received_headers = None
+        received_headers = ()
 
         class Handler(BaseHTTPRequestHandler):
             def do_POST(self):
@@ -139,36 +139,19 @@ class TestIntegration(unittest.TestCase):
         with freeze_time('2012-01-14 03:21:34'):
             make_request()
 
-        self.assertEqual(received_headers, (
-            (
-                'Host',
-                'localhost:8080',
-            ),
-            (
-                'authorization',
-                'Signature: keyId="my-key", created=1326511294, headers="(request-target) '
-                '(created) user-agent accept-encoding accept connection content-length digest", '
-                'signature="IngdVNAhHx5E98AdkeOrkUC0Zy8v1ix2E4rbG0c3i9X3yicHKNKt+uACYntKvNFA5q1q9C'
-                'GoG45W63u3JshCDg=="',
-            ),
-            (
-                'User-Agent', 'python-requests/2.23.0',
-            ),
-            (
-                'Accept-Encoding', 'gzip, deflate',
-            ),
-            (
-                'Accept', '*/*',
-            ),
-            (
-                'Connection', 'keep-alive',
-            ),
-            (
-                'Content-Length', '9',
-            ),
-            (
-                'digest',
-                'SHA512=Jpu2uP4aOrJMRxr5j9NKiqwK0ksXiftpjdHOGJTU4v7BxYvf/nEYHxeWL7YCsFXE3XJ9q2luOW'
-                'XKpCQmDaQxCg==',
-            )
-        ))
+        received_headers_dict = dict((key.lower(), value) for key, value in received_headers)
+        self.assertEqual(received_headers_dict, {
+            'host': 'localhost:8080',
+            'authorization': 'Signature: keyId="my-key", created=1326511294, '
+                             'headers="(request-target) (created) user-agent accept-encoding '
+                             'accept connection content-length digest", signature="IngdVNAhHx5E98A'
+                             'dkeOrkUC0Zy8v1ix2E4rbG0c3i9X3yicHKNKt+uACYntKvNFA5q1q9CGoG45W63u3Jsh'
+                             'CDg=="',
+            'user-agent': 'python-requests/2.23.0',
+            'accept-encoding': 'gzip, deflate',
+            'accept': '*/*',
+            'connection': 'keep-alive',
+            'content-length': '9',
+            'digest': 'SHA512=Jpu2uP4aOrJMRxr5j9NKiqwK0ksXiftpjdHOGJTU4v7BxYvf/nEYHxeWL7YCsFXE3XJ9'
+                      'q2luOWXKpCQmDaQxCg=='
+        })
