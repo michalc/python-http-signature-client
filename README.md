@@ -52,7 +52,7 @@ response = requests.post('http://mydomain.test/path', data=b'The bytes', auth=Ht
 ```
 
 
-## Recipe: Create a Ed25519 public/private key pair
+## Recipe: Create an Ed25519 public/private key pair
 
 ```python
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
