@@ -40,6 +40,7 @@ class HttpSignatureWithBodyDigest(request.auth.AuthBase):
             self.key_id, self.private_key.sign, r.method, path, headers_to_sign))
         return r
 
+# In real cases, take credentials from environment variables/secret store
 key_id = 'my-key'
 pem_private_key =\
     b'-----BEGIN PRIVATE KEY-----\n' \
