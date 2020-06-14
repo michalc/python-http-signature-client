@@ -109,6 +109,27 @@ print(private_key.public_key().public_bytes(encoding=Encoding.PEM, format=Public
 ```
 
 
+## API
+
+### Parameters
+
+- `key_id` - The keyId parameter sent with the signature.
+
+- `sign` - A function that signs the the request bytes once canonicalised. Typically, this would be a function that uses a private key.
+
+- `method` - The HTTP method of the request, such as `GET` or `POST`.
+
+- `path` - The full path of the request, including any query string.
+
+- `headers_to_sign` - HTTP header names and values to sign.
+
+- `headers_to_ignore` - HTTP header names to _not_ be signed, even if passed in `headers_to_ignore`. These default to hop-by-hop-headers that are changed by intermediaries.
+
+### Returns
+
+The `headers_to_sign` argument concatanated with an `authorization` header containing the HTTP signature.
+
+
 ## What's implemented
 
 A deliberate subset of the signature algorithm is implemented:
@@ -118,5 +139,3 @@ A deliberate subset of the signature algorithm is implemented:
 - the `headers` parameter is sent [to allow the server to verify headers and pseudo-headers]
 - the `expires` parameter is _not_ sent [the server can decide this using the created parameter];
 - the `algorithm` parameter is _not_ sent [it should not be used by the server to choose the algorithm].
-
-Note _not_ all headers passed as the `headers_to_sign` parameter are signed by default: common hop-by-hop headers are ignored, since they typically won't make it to the target server unchanged. To customise this list of ignored headers, override the `headers_to_ignore` parameter.

@@ -8,7 +8,8 @@ def sign_headers(
         key_id: str, sign: Callable[[bytes], bytes], method: str, path: str,
         headers_to_sign: Tuple[Tuple[str, str], ...],
         headers_to_ignore: FrozenSet[str] = frozenset(('keep-alive',
-                                                       'transfer-encoding', 'connection'))):
+                                                       'transfer-encoding', 'connection'))) \
+        -> Tuple[Tuple[str, str], ...]:
     method_lower = method.lower()
     created = str(int(datetime.now().timestamp()))
 
