@@ -32,6 +32,7 @@ class TestIntegration(unittest.TestCase):
         body_sha512 = b64encode(hashlib.sha512(b'some-data').digest()).decode('ascii')
         headers = (
             ('digest', f'SHA512={body_sha512}'),
+            ('connection', 'close'),
             ('x-custom', 'first  '),
             ('x-custom', '  second'),
         )
@@ -55,6 +56,9 @@ class TestIntegration(unittest.TestCase):
                 'TWTH306npMew==',
             ),
             (
+                'connection', 'close',
+            ),
+            (
                 'x-custom', 'first  ',
             ),
             (
@@ -64,6 +68,7 @@ class TestIntegration(unittest.TestCase):
 
         headers_same_canonicalisation = (
             ('Digest', f'SHA512={body_sha512}'),
+            ('connection', 'keep-alive'),
             ('X-Custom', 'first  '),
             ('x-custom', '  second'),
         )
@@ -81,6 +86,9 @@ class TestIntegration(unittest.TestCase):
                 'Digest',
                 'SHA512=4cT8Z/GQnjUIPMUwn8ujbSdDM6PEAJqUqXBSc+QfyIthia0VdVHj050dqkQSJk0TEgtnE8mdO+'
                 'TWTH306npMew==',
+            ),
+            (
+                'connection', 'keep-alive',
             ),
             (
                 'X-Custom', 'first  ',
