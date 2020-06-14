@@ -113,9 +113,9 @@ print(private_key.public_key().public_bytes(encoding=Encoding.PEM, format=Public
 
 ### Parameters
 
-- `key_id` - The keyId parameter sent with the signature.
+- `key_id` - The keyId parameter sent with the signature. Typically, the server treats this as the claimed identity of the client.
 
-- `sign` - A function that signs the the request bytes once canonicalised. Typically, this would be a function that uses a private key.
+- `sign` - A function that signs the request bytes once canonicalised. Typically, this would be a function that uses a private key.
 
 - `method` - The HTTP method of the request, such as `GET` or `POST`.
 
@@ -123,7 +123,7 @@ print(private_key.public_key().public_bytes(encoding=Encoding.PEM, format=Public
 
 - `headers_to_sign` - HTTP header names and values to sign.
 
-- `headers_to_ignore` - HTTP header names to _not_ be signed, even if passed in `headers_to_ignore`. These default to hop-by-hop-headers that are changed by intermediaries.
+- `headers_to_ignore` - HTTP header names to _not_ be signed, even if passed in `headers_to_ignore`. These default to hop-by-hop-headers that are typically set by intermediaries.
 
 ### Returns
 
