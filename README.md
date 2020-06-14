@@ -60,3 +60,5 @@ A deliberate subset of the signature algorithm is implemented:
 - the `headers` parameter is sent [to allow the server to verify headers and pseudo-headers]
 - the `expires` parameter is _not_ sent [the server can decide this using the created parameter];
 - the `algorithm` parameter is _not_ sent [it should not be used by the server to choose the algorithm].
+
+Note _not_ all headers passed as the `headers_to_sign` parameter are signed by default: common hop-by-hop headers are ignored, since they typically won't make it to the target server unchanged. To customise this list of ignored headers, override the `headers_to_ignore` parameter.
