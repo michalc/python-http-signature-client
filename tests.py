@@ -39,7 +39,6 @@ class TestIntegration(unittest.TestCase):
         with freeze_time('2012-01-14 03:21:34'):
             signed_headers = sign_headers(key_id, private_key.sign, method, url, headers)
 
-        print(signed_headers)
         self.assertEqual(signed_headers, (
             (
                 'authorization',
