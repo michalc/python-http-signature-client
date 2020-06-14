@@ -12,7 +12,7 @@ def sign_headers(
     method_lower = method.lower()
     created = str(int(datetime.now().timestamp()))
 
-    def canonical_headers() -> Tuple:
+    def canonical_headers() -> Tuple[Tuple[str, str], ...]:
         headers_lists: DefaultDict[str, List[str]] = defaultdict(list)
         for key, value in headers_to_sign:
             key_lower = key.lower()
