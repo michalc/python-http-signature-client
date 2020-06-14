@@ -6,7 +6,7 @@ from typing import Callable, DefaultDict, FrozenSet, List, Tuple
 
 def sign_headers(
         key_id: str, sign: Callable[[bytes], bytes], method: str, path: str,
-        headers_to_sign: Tuple[Tuple[str, str]],
+        headers_to_sign: Tuple[Tuple[str, str], ...],
         hop_by_hop_headers: FrozenSet = frozenset(('keep-alive',
                                                    'transfer-encoding', 'connection'))):
     method_lower = method.lower()
