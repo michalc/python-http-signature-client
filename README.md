@@ -16,23 +16,28 @@ signed_headers = sign_headers(key_id, sign, method, path, headers_to_sign)
 
 ```python
 from base64 import b64encode
+import hashlib
+
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
-import hashlib
-from http_signature_client import sign_headers
-from requests.auth import AuthBase
+import requests
+import urllib3
 
-class HttpSignatureWithBodyDigest(AuthBase):
+from http_signature_client import sign_headers
+
+class HttpSignatureWithBodyDigest(request.auth.AuthBase):
     def __init__(self, key_id, pem_private_key):
         self.key_id = key_id
-        self.private_key = load_pem_private_key(pem_private_key, password=None, backend=default_backend())
+        self.private_key = load_pem_private_key(
+            pem_private_key, password=None, backend=default_backend())
 
     def __call__(self, r):
         body_sha512 = b64encode(hashlib.sha512(r.body).digest()).decode('ascii')
-        headers_to_sign = r.headers.items() + (('digest', f'SHA512={body_sha512}'))
+        headers_to_sign = tuple(r.headers.items()) + (('digest', f'SHA512={body_sha512}'),)
+        parsed_url = urllib3.util.url.parse_url(r.path_url)
+        path = parsed_url.path + (f'?{parsed_url.query}' if parsed_url.query else '')
         r.headers = dict(sign_headers(
-            self.key_id, self.private_key.sign,
-            r.method, r.path, r.headers.items(), body_sha512))
+            self.key_id, self.private_key.sign, r.method, path, headers_to_sign))
         return r
 
 response = requests.post('http://mydomain.test/path', data=b'The bytes',
