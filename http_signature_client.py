@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 def sign_headers(key_id, sign, method, path, headers_to_sign):
+    method_lower = method.lower()
     created = str(int(datetime.now().timestamp()))
 
     def canonical_headers():
@@ -13,7 +14,7 @@ def sign_headers(key_id, sign, method, path, headers_to_sign):
         return tuple((key, ', '.join(values)) for key, values in headers_lists.items())
 
     signature_input = (
-        ('(request-target)', f'{method} {path}'),
+        ('(request-target)', f'{method_lower} {path}'),
         ('(created)', created),
     ) + canonical_headers()
 

@@ -124,7 +124,7 @@ class TestIntegration(unittest.TestCase):
                 parsed_url = urllib3.util.url.parse_url(r.path_url)
                 path = parsed_url.path + (f'?{parsed_url.query}' if parsed_url.query else '')
                 r.headers = dict(sign_headers(
-                    self.key_id, self.private_key.sign, r.method.lower(), path, headers_to_sign))
+                    self.key_id, self.private_key.sign, r.method, path, headers_to_sign))
                 return r
 
         def make_request():
