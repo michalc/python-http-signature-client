@@ -1,7 +1,7 @@
 from base64 import b64encode
 from collections import defaultdict
 from datetime import datetime
-from typing import Callable, FrozenSet, Tuple
+from typing import Callable, DefaultDict, FrozenSet, List, Tuple
 
 
 def sign_headers(
@@ -12,8 +12,8 @@ def sign_headers(
     method_lower = method.lower()
     created = str(int(datetime.now().timestamp()))
 
-    def canonical_headers():
-        headers_lists = defaultdict(list)
+    def canonical_headers() -> Tuple:
+        headers_lists: DefaultDict[str, List[str]] = defaultdict(list)
         for key, value in headers_to_sign:
             key_lower = key.lower()
             if key_lower not in hop_by_hop_headers:
