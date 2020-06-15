@@ -15,7 +15,7 @@ pip install http-signature-client
 from http_signature_client import sign_headers
 
 def sign(data):
-	# Return a signature of `data`, for example using a private key
+    # Return a signature of `data`, for example using a private key
 
 signed_headers = sign_headers(key_id, sign, method, path, headers_to_sign)
 ```
