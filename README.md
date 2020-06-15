@@ -46,7 +46,7 @@ class HttpSignature(httpx.Auth):
         yield r
 
 # In real cases, take credentials from environment variables/secret store
-response = requests.post('https://postman-echo.com/post', data=b'The bytes', auth=HttpSignature(
+response = httpx.post('https://postman-echo.com/post', data=b'The bytes', auth=HttpSignature(
     key_id='my-key',
     pem_private_key= \
         b'-----BEGIN PRIVATE KEY-----\n' \
