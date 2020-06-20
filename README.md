@@ -140,5 +140,5 @@ A deliberate subset of the signature algorithm is implemented:
 - the `(request-target)` pseudo-header is sent and signed [to allow the server to verify the method and path];
 - the `created` parameter is sent and signed [to allow the server to decide to reject if the skew is too large];
 - the `headers` parameter is sent and signed [to allow the server to verify headers and pseudo-headers];
-- the `expired` parameter is _not_ sent [the server can decide this using the created parameter];
+- the `expires` parameter is _not_ sent [the server can decide this using the created parameter];
 - the `algorithm` parameter is _not_ sent [it should not be used by the server to choose the algorithm].
