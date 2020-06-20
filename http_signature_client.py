@@ -22,8 +22,8 @@ def sign_headers(
         return tuple((key, ', '.join(values)) for key, values in headers_lists.items())
 
     signature_input = (
-        ('(request-target)', f'{method_lower} {path}'),
         ('(created)', created),
+        ('(request-target)', f'{method_lower} {path}'),
     ) + canonical_headers()
 
     signature = b64encode(sign('\n'.join(

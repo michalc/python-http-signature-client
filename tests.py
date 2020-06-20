@@ -6,8 +6,9 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import socketserver
 import threading
 
-
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from freezegun import freeze_time
 import httpx
@@ -42,9 +43,9 @@ class TestIntegration(unittest.TestCase):
             signed_headers = sign_headers(key_id, private_key.sign, method, url, headers)
 
         correct_authorization = \
-            'Signature: keyId="my-key", created=1326511294, headers="(request-target) (created) ' \
-            'digest x-custom", signature="rRcnh3PzKV8isZ+4fW7T4aTswbbDT+JGyQ4HtFn8GlxkbHxkRmN5W3' \
-            'HPRlRMSF/NrawTZ+kXjkFKaUrar0syAw=="'
+            'Signature: keyId="my-key", created=1326511294, headers="(created) (request-target) ' \
+            'digest x-custom", signature="LiZ968GglNEGaEYcyyYM9TIQ6Z7I2DqYw3T0WfJuDOk27UW0XCQ70p' \
+            '3fmg2ju0EsyGDcLeA66DzUQR5YcpTDDA=="'
 
         self.assertEqual(signed_headers, (
             (
@@ -153,9 +154,9 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(received_headers_dict, {
             'host': 'localhost:8080',
             'authorization': 'Signature: keyId="my-key", created=1326511294, '
-                             'headers="(request-target) (created) user-agent accept-encoding '
-                             'accept content-length digest", signature="3xG3OmL3Edy62McmHf6aXhvrcC'
-                             'P3J9isR8yMA6tIjdyoe8vQz9PJP8AF8oLUzmcVO/dvG/F0zCCAoAah1FTkDg=="',
+                             'headers="(created) (request-target) user-agent accept-encoding '
+                             'accept content-length digest", signature="5E9AExVYVmMLQetvKgF1HkE394'
+                             'fF90X0oaazWIoM1wAIfPCi7En658gIhrEfnJ9FHm/zt2loSG6RVGtMma3HDQ=="',
             'user-agent': 'python-requests/2.23.0',
             'accept-encoding': 'gzip, deflate',
             'accept': '*/*',
@@ -166,7 +167,6 @@ class TestIntegration(unittest.TestCase):
         })
 
     def test_httpx(self):
-        self.maxDiff = 10000
         received_headers = ()
 
         class Handler(BaseHTTPRequestHandler):
@@ -223,9 +223,9 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(received_headers_dict, {
             'host': 'localhost:8080',
             'authorization': 'Signature: keyId="my-key", created=1326511294, '
-                             'headers="(request-target) (created) host user-agent accept '
-                             'accept-encoding content-length digest", signature="KfvrEdkreYuFQNpCz'
-                             'CK2oZJZg3lFM1UZPOjOH8aixLTO0ilBDvcvDk0PMXLd0kj0LpbR2Qy2w/VgOhwqbiqbD'
+                             'headers="(created) (request-target) host user-agent accept '
+                             'accept-encoding content-length digest", signature="jgNe5f7OFtQqxhaBU'
+                             'bxGedyrEbyPihe/ux/B/B6T0xbkvHnDKPg/bvlINBWDfeM3r0bmlKG9eazjkr10iIIfC'
                              'w=="',
             'user-agent': 'python-httpx/0.13.3',
             'accept-encoding': 'gzip, deflate',
@@ -235,3 +235,73 @@ class TestIntegration(unittest.TestCase):
             'digest': 'SHA512=Jpu2uP4aOrJMRxr5j9NKiqwK0ksXiftpjdHOGJTU4v7BxYvf/nEYHxeWL7YCsFXE3XJ9'
                       'q2luOWXKpCQmDaQxCg=='
         })
+
+    def test_case_hs2019(self):
+        # The test case in the draft specifies SHA-512, however, from trial and error,
+        # the given signature must have been generated using SHA-256
+
+        rsa_private_key = \
+            b'-----BEGIN RSA PRIVATE KEY-----\n' \
+            b'MIIEqAIBAAKCAQEAhAKYdtoeoy8zcAcR874L8cnZxKzAGwd7v36APp7Pv6Q2jdsP\n' \
+            b'BRrwWEBnez6d0UDKDwGbc6nxfEXAy5mbhgajzrw3MOEt8uA5txSKobBpKDeBLOsd\n' \
+            b'JKFqMGmXCQvEG7YemcxDTRPxAleIAgYYRjTSd/QBwVW9OwNFhekro3RtlinV0a75\n' \
+            b'jfZgkne/YiktSvLG34lw2zqXBDTC5NHROUqGTlML4PlNZS5Ri2U4aCNx2rUPRcKI\n' \
+            b'lE0PuKxI4T+HIaFpv8+rdV6eUgOrB2xeI1dSFFn/nnv5OoZJEIB+VmuKn3DCUcCZ\n' \
+            b'SFlQPSXSfBDiUGhwOw76WuSSsf1D4b/vLoJ10wIDAQABAoIBAG/JZuSWdoVHbi56\n' \
+            b'vjgCgkjg3lkO1KrO3nrdm6nrgA9P9qaPjxuKoWaKO1cBQlE1pSWp/cKncYgD5WxE\n' \
+            b'CpAnRUXG2pG4zdkzCYzAh1i+c34L6oZoHsirK6oNcEnHveydfzJL5934egm6p8DW\n' \
+            b'+m1RQ70yUt4uRc0YSor+q1LGJvGQHReF0WmJBZHrhz5e63Pq7lE0gIwuBqL8SMaA\n' \
+            b'yRXtK+JGxZpImTq+NHvEWWCu09SCq0r838ceQI55SvzmTkwqtC+8AT2zFviMZkKR\n' \
+            b'Qo6SPsrqItxZWRty2izawTF0Bf5S2VAx7O+6t3wBsQ1sLptoSgX3QblELY5asI0J\n' \
+            b'YFz7LJECgYkAsqeUJmqXE3LP8tYoIjMIAKiTm9o6psPlc8CrLI9CH0UbuaA2JCOM\n' \
+            b'cCNq8SyYbTqgnWlB9ZfcAm/cFpA8tYci9m5vYK8HNxQr+8FS3Qo8N9RJ8d0U5Csw\n' \
+            b'DzMYfRghAfUGwmlWj5hp1pQzAuhwbOXFtxKHVsMPhz1IBtF9Y8jvgqgYHLbmyiu1\n' \
+            b'mwJ5AL0pYF0G7x81prlARURwHo0Yf52kEw1dxpx+JXER7hQRWQki5/NsUEtv+8RT\n' \
+            b'qn2m6qte5DXLyn83b1qRscSdnCCwKtKWUug5q2ZbwVOCJCtmRwmnP131lWRYfj67\n' \
+            b'B/xJ1ZA6X3GEf4sNReNAtaucPEelgR2nsN0gKQKBiGoqHWbK1qYvBxX2X3kbPDkv\n' \
+            b'9C+celgZd2PW7aGYLCHq7nPbmfDV0yHcWjOhXZ8jRMjmANVR/eLQ2EfsRLdW69bn\n' \
+            b'f3ZD7JS1fwGnO3exGmHO3HZG+6AvberKYVYNHahNFEw5TsAcQWDLRpkGybBcxqZo\n' \
+            b'81YCqlqidwfeO5YtlO7etx1xLyqa2NsCeG9A86UjG+aeNnXEIDk1PDK+EuiThIUa\n' \
+            b'/2IxKzJKWl1BKr2d4xAfR0ZnEYuRrbeDQYgTImOlfW6/GuYIxKYgEKCFHFqJATAG\n' \
+            b'IxHrq1PDOiSwXd2GmVVYyEmhZnbcp8CxaEMQoevxAta0ssMK3w6UsDtvUvYvF22m\n' \
+            b'qQKBiD5GwESzsFPy3Ga0MvZpn3D6EJQLgsnrtUPZx+z2Ep2x0xc5orneB5fGyF1P\n' \
+            b'WtP+fG5Q6Dpdz3LRfm+KwBCWFKQjg7uTxcjerhBWEYPmEMKYwTJF5PBG9/ddvHLQ\n' \
+            b'EQeNC8fHGg4UXU8mhHnSBt3EA10qQJfRDs15M38eG2cYwB1PZpDHScDnDA0=\n' \
+            b'-----END RSA PRIVATE KEY-----\n'
+
+        private_key = load_pem_private_key(
+            rsa_private_key, password=None, backend=default_backend())
+
+        def sign(data):
+            return private_key.sign(
+                data,
+                padding=padding.PKCS1v15(),
+                algorithm=hashes.SHA256(),
+            )
+
+        path = '/foo?param=value&pet=dog'
+        headers = (
+            ('host', 'example.com'),
+            ('date', 'Tue, 07 Jun 2014 20:51:35 GMT'),
+            ('content-type', 'application/json'),
+            ('digest', 'SHA-256=X48E9qOokqqrvdts8nOJRJN3OWDUoyWxBf7kbu9DBPE='),
+            ('content-length', '18'),
+        )
+
+        with freeze_time('2014-06-07 19:51:35 UTC'):
+            signed_headers = sign_headers('test-key-a', sign, 'POST', path, headers)
+
+        auth_header = dict(signed_headers)['authorization']
+
+        expected_signature = \
+            'KXUj1H3ZOhv3Nk4xlRLTn4bOMlMOmFiud3VXrMa9MaLCxnVmrqOX5BulRvB65YW/wQp0o' \
+            'T/nNQpXgOYeY8ovmHlpkRyz5buNDqoOpRsCpLGxsIJ9cX8XVsM9jy+Q1+RIlD9wfWoPHh' \
+            'qhoXt35ZkasuIDPF/AETuObs9QydlsqONwbK+TdQguDK/8Va1Pocl6wK1uLwqcXlxhPEb' \
+            '55EmdYB9pddDyHTADING7K4qMwof2mC3t8Pb0yoLZoZX5a4Or4FrCCKK/9BHAhq/RsVk0' \
+            'dTENMbTB4i7cHvKQu+o9xuYWuxyvBa0Z6NdOb0di70cdrSDEsL5Gz7LBY5J2N9KdGg=='
+        expected_auth_header = \
+            f'Signature: keyId="test-key-a", created=1402170695, ' \
+            f'headers="(created) (request-target) host date content-type digest content-length"' \
+            f', signature="{expected_signature}"'
+
+        self.assertEqual(expected_auth_header, auth_header)
