@@ -41,8 +41,15 @@ jobs:
       - run:
           name: Run tests
           command: |
+            pip install \
+              . \
+              freezegun==0.3.15 \
+              cryptography==2.9.2 \
+              httpx==0.13.3 \
+              requests==2.23.0 \
+              urllib3==1.25.9
             ./cc-test-reporter before-build
-            coverage run -m setup test -v
+            coverage run -m unittest -vb
             coverage xml -i
             ./cc-test-reporter after-build --exit-code $?
   test-3.8.2: &template
@@ -53,7 +60,14 @@ jobs:
       - run:
           name: Run tests
           command: |
-            python -m setup test -v
+            pip install \
+              . \
+              freezegun==0.3.15 \
+              cryptography==2.9.2 \
+              httpx==0.13.3 \
+              requests==2.23.0 \
+              urllib3==1.25.9
+            python -m unittest -vb
   test-3.8.1:
     <<: *template
     docker:

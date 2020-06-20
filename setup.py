@@ -26,12 +26,4 @@ setuptools.setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Security :: Cryptography',
     ],
-    test_suite='tests',
-    tests_require=[
-        'freezegun==0.3.15',
-        'cryptography==2.9.2',
-        'httpx==0.13.3',
-        'requests==2.23.0',
-        'urllib3==1.25.9',
-    ]
 )
