@@ -20,7 +20,7 @@ from http_signature_client import sign_headers
 
 class TestIntegration(unittest.TestCase):
 
-    def test_with_digest(self):
+    def test_canonicalisation(self):
         key_id = 'my-key'
         pem_private_key = \
             b'-----BEGIN PRIVATE KEY-----\n' \
@@ -37,15 +37,18 @@ class TestIntegration(unittest.TestCase):
             ('connection', 'close'),
             ('x-custom', 'first  '),
             ('x-custom', '  second'),
+            ('(request-target)', 'some-value'),
+            ('(created)', 'some-other-value'),
         )
 
         with freeze_time('2012-01-14 03:21:34'):
             signed_headers = sign_headers(key_id, private_key.sign, method, url, headers)
 
+        self.maxDiff = 10000
         correct_authorization = \
             'Signature: keyId="my-key", created=1326511294, headers="(created) (request-target) ' \
-            'digest x-custom", signature="LiZ968GglNEGaEYcyyYM9TIQ6Z7I2DqYw3T0WfJuDOk27UW0XCQ70p' \
-            '3fmg2ju0EsyGDcLeA66DzUQR5YcpTDDA=="'
+            'digest x-custom", signature="yiZbaEqcpfUbPfvoHJsvX3ypzZdtFjQTTjAi3ZpjtLbYO2ZTY2+TNy' \
+            'dQCw8D/PgRvg9is/kJaaPTe0RnHiosBw=="'
 
         self.assertEqual(signed_headers, (
             (
@@ -65,7 +68,13 @@ class TestIntegration(unittest.TestCase):
             ),
             (
                 'x-custom', '  second',
-            )
+            ),
+            (
+                '(request-target)', 'some-value',
+            ),
+            (
+                '(created)', 'some-other-value',
+            ),
         ))
 
         headers_same_canonicalisation = (
@@ -73,6 +82,8 @@ class TestIntegration(unittest.TestCase):
             ('connection', 'keep-alive'),
             ('X-Custom', 'first  '),
             ('x-custom', '  second'),
+            ('(request-Target)', 'some-value'),
+            ('(creaTed)', 'some-other-value'),
         )
 
         with freeze_time('2012-01-14 03:21:34'):
@@ -97,7 +108,13 @@ class TestIntegration(unittest.TestCase):
             ),
             (
                 'x-custom', '  second',
-            )
+            ),
+            (
+                '(request-Target)', 'some-value',
+            ),
+            (
+                '(creaTed)', 'some-other-value',
+            ),
         ))
 
     def test_requests(self):

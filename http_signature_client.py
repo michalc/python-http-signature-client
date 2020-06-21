@@ -10,21 +10,23 @@ def sign_headers(
         headers_to_ignore: FrozenSet[str] = frozenset(('keep-alive',
                                                        'transfer-encoding', 'connection'))) \
         -> Tuple[Tuple[str, str], ...]:
-    method_lower = method.lower()
     created = str(int(datetime.now().timestamp()))
 
-    def canonical_headers() -> Tuple[Tuple[str, str], ...]:
+    def _signature_input() -> Tuple[Tuple[str, str], ...]:
+        method_lower = method.lower()
+        headers_with_pseudo_headers = (
+            ('(created)', created),
+            ('(request-target)', f'{method_lower} {path}'),
+        ) + headers_to_sign
+
         headers_lists: DefaultDict[str, List[str]] = defaultdict(list)
-        for key, value in headers_to_sign:
+        for key, value in headers_with_pseudo_headers:
             key_lower = key.lower()
             if key_lower not in headers_to_ignore:
                 headers_lists[key_lower].append(value.strip())
         return tuple((key, ', '.join(values)) for key, values in headers_lists.items())
 
-    signature_input = (
-        ('(created)', created),
-        ('(request-target)', f'{method_lower} {path}'),
-    ) + canonical_headers()
+    signature_input = _signature_input()
 
     signature = b64encode(sign('\n'.join(
         f'{key}: {value}' for key, value in signature_input
