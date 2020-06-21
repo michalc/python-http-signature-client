@@ -33,8 +33,7 @@ def sign_headers(
     ).encode('ascii'))).decode('ascii')
 
     headers = ' '.join(key for key, _ in signature_input)
-    authorization = \
-        f'Signature: keyId="{key_id}", created={created}, headers="{headers}", ' \
-        f'signature="{signature}"'
+    signature = \
+        f'keyId="{key_id}", created={created}, headers="{headers}", signature="{signature}"'
 
-    return (('authorization', authorization),) + headers_to_sign
+    return (('signature', signature),) + headers_to_sign

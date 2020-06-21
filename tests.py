@@ -45,15 +45,15 @@ class TestIntegration(unittest.TestCase):
             signed_headers = sign_headers(key_id, private_key.sign, method, url, headers)
 
         self.maxDiff = 10000
-        correct_authorization = \
-            'Signature: keyId="my-key", created=1326511294, headers="(created) (request-target) ' \
-            'digest x-custom", signature="yiZbaEqcpfUbPfvoHJsvX3ypzZdtFjQTTjAi3ZpjtLbYO2ZTY2+TNy' \
-            'dQCw8D/PgRvg9is/kJaaPTe0RnHiosBw=="'
+        correct_signature = \
+            'keyId="my-key", created=1326511294, headers="(created) (request-target) digest ' \
+            'x-custom", signature="yiZbaEqcpfUbPfvoHJsvX3ypzZdtFjQTTjAi3ZpjtLbYO2ZTY2+TNydQCw8D/' \
+            'PgRvg9is/kJaaPTe0RnHiosBw=="'
 
         self.assertEqual(signed_headers, (
             (
-                'authorization',
-                correct_authorization,
+                'signature',
+                correct_signature,
             ),
             (
                 'digest',
@@ -92,8 +92,8 @@ class TestIntegration(unittest.TestCase):
 
         self.assertEqual(signed_headers_mixed, (
             (
-                'authorization',
-                correct_authorization,
+                'signature',
+                correct_signature,
             ),
             (
                 'Digest',
@@ -170,10 +170,10 @@ class TestIntegration(unittest.TestCase):
         received_headers_dict = dict((key.lower(), value) for key, value in received_headers)
         self.assertEqual(received_headers_dict, {
             'host': 'localhost:8080',
-            'authorization': 'Signature: keyId="my-key", created=1326511294, '
-                             'headers="(created) (request-target) user-agent accept-encoding '
-                             'accept content-length digest", signature="5E9AExVYVmMLQetvKgF1HkE394'
-                             'fF90X0oaazWIoM1wAIfPCi7En658gIhrEfnJ9FHm/zt2loSG6RVGtMma3HDQ=="',
+            'signature': 'keyId="my-key", created=1326511294, headers="(created) (request-target) '
+                         'user-agent accept-encoding '
+                         'accept content-length digest", signature="5E9AExVYVmMLQetvKgF1HkE394fF90'
+                         'X0oaazWIoM1wAIfPCi7En658gIhrEfnJ9FHm/zt2loSG6RVGtMma3HDQ=="',
             'user-agent': 'python-requests/2.23.0',
             'accept-encoding': 'gzip, deflate',
             'accept': '*/*',
@@ -239,11 +239,10 @@ class TestIntegration(unittest.TestCase):
         received_headers_dict = dict((key.lower(), value) for key, value in received_headers)
         self.assertEqual(received_headers_dict, {
             'host': 'localhost:8080',
-            'authorization': 'Signature: keyId="my-key", created=1326511294, '
-                             'headers="(created) (request-target) host user-agent accept '
-                             'accept-encoding content-length digest", signature="jgNe5f7OFtQqxhaBU'
-                             'bxGedyrEbyPihe/ux/B/B6T0xbkvHnDKPg/bvlINBWDfeM3r0bmlKG9eazjkr10iIIfC'
-                             'w=="',
+            'signature': 'keyId="my-key", created=1326511294, headers="(created) (request-target) '
+                         'host user-agent accept accept-encoding content-length digest", '
+                         'signature="jgNe5f7OFtQqxhaBUbxGedyrEbyPihe/ux/B/B6T0xbkvHnDKPg/bvlINBWDf'
+                         'eM3r0bmlKG9eazjkr10iIIfCw=="',
             'user-agent': 'python-httpx/0.13.3',
             'accept-encoding': 'gzip, deflate',
             'accept': '*/*',
@@ -308,7 +307,7 @@ class TestIntegration(unittest.TestCase):
         with freeze_time('2014-06-07 19:51:35 UTC'):
             signed_headers = sign_headers('test-key-a', sign, 'POST', path, headers)
 
-        auth_header = dict(signed_headers)['authorization']
+        sig_header = dict(signed_headers)['signature']
 
         expected_signature = \
             'KXUj1H3ZOhv3Nk4xlRLTn4bOMlMOmFiud3VXrMa9MaLCxnVmrqOX5BulRvB65YW/wQp0o' \
@@ -316,9 +315,8 @@ class TestIntegration(unittest.TestCase):
             'qhoXt35ZkasuIDPF/AETuObs9QydlsqONwbK+TdQguDK/8Va1Pocl6wK1uLwqcXlxhPEb' \
             '55EmdYB9pddDyHTADING7K4qMwof2mC3t8Pb0yoLZoZX5a4Or4FrCCKK/9BHAhq/RsVk0' \
             'dTENMbTB4i7cHvKQu+o9xuYWuxyvBa0Z6NdOb0di70cdrSDEsL5Gz7LBY5J2N9KdGg=='
-        expected_auth_header = \
-            f'Signature: keyId="test-key-a", created=1402170695, ' \
-            f'headers="(created) (request-target) host date content-type digest content-length"' \
-            f', signature="{expected_signature}"'
+        expected_sig_header = \
+            f'keyId="test-key-a", created=1402170695, headers="(created) (request-target) host ' \
+            f'date content-type digest content-length", signature="{expected_signature}"'
 
-        self.assertEqual(expected_auth_header, auth_header)
+        self.assertEqual(expected_sig_header, sig_header)

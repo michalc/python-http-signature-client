@@ -130,7 +130,7 @@ print(private_key.public_key().public_bytes(encoding=Encoding.PEM, format=Public
 
 ### Returns
 
-The `headers_to_sign` argument concatanated with an `authorization` header containing the HTTP signature.
+The `headers_to_sign` argument concatanated with an `signature` header containing the HTTP signature.
 
 
 ## What's implemented
