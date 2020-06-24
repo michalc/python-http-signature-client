@@ -126,9 +126,9 @@ print(private_key.public_key().public_bytes(encoding=Encoding.PEM, format=Public
 
 - `path` - The full path of the request, including any query string.
 
-- `headers_to_sign` - HTTP header names and values to sign.
+- `headers_to_sign` - A tuple of (key, value) pairs of HTTP headers to sign.
 
-- `headers_to_ignore` - HTTP header names to _not_ be signed, even if passed in `headers_to_sign`. These default to hop-by-hop-headers that are typically set by intermediaries.
+- `headers_to_ignore` - A `frozenset` of HTTP header names to _not_ be signed, even if passed in `headers_to_sign`. These default to hop-by-hop-headers that are typically set by intermediaries.
 
 ### Returns
 
